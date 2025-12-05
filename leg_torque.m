@@ -1,0 +1,30 @@
+function torque = leg_torque(F,Tp,phi1,phi4)
+    l1 = 0.15;
+    l2 = 0.25;
+    l3 = l2;
+    l4 = l1;
+    l5 = 0.108;
+    Xb = l1 * cos(phi1);
+    Yb = l1 * sin(phi1);
+    Xd = l4 * cos(phi4) + l5;
+    Yd = l4 * sin(phi4);
+    lbd = sqrt((Xd - Xb)^2 + (Yd - Yb)^2);
+    A0 = 2 * l2 * (Xd - Xb);
+    B0 = 2 * l2 * (Yd - Yb);
+    C0 = l2^2 + lbd^2 - l3^2;
+    phi2 = 2 * atan2((B0 + sqrt(A0^2 + B0^2 - C0^2)), (A0 + C0));
+    phi3 = atan2(Yb - Yd + l2 * sin(phi2), Xb - Xd + l2 * cos(phi2));
+    Xc = Xb + l2 * cos(phi2);
+    Yc = Yb + l2 * sin(phi2);
+    l0 = sqrt((Xc - l5/2)^2 + Yc^2);
+    phi0 = atan2(Yc, (Xc - l5/2));
+    j11 = (l1 * sin(phi0 - phi3) * sin(phi1 - phi2)) / sin(phi3 - phi2);
+    j12 = (l1 * cos(phi0 - phi3) * sin(phi1 - phi2)) / (l0 * sin(phi3 - phi2));
+    j21 = (l4 * sin(phi0 - phi2) * sin(phi3 - phi4)) / sin(phi3 - phi2);
+    j22 = (l4 * cos(phi0 - phi2) * sin(phi3 - phi4)) / (l0 * sin(phi3 - phi2));
+    J = [j11 j12;
+         j21 j22];
+    torque = J * [F; Tp];
+    T1 = torque(1, 1);
+    T2 = torque(2, 1);
+end
